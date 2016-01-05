@@ -1,6 +1,7 @@
 import os
-import sys
+#import sys
 import shutil
+import argparse
 
 import zbar
 #import Image
@@ -13,13 +14,16 @@ skipped = 0
 def main():
   global total, renamed, skipped
   
-  if(sys.argv.count == 2):
-    indir = sys.argv[1]
-    outdir = sys.argv[2]
-  else:
-    print 'USAGE: extract.py /src_dir /dst_dir'
-    return False
+  parser = argparse.ArgumentParser()
+  parser.add_argument("indir", help="source directory")
+  parser.add_argument("outdir", help="destination directory")
+  parser.add_argument("-m", "--move", help="delete files from source directory after rename",
+                      action="store_true")
+  args = parser.parse_args()
   
+  indir = args.indir
+  outdir = args.outdir
+    
   if not os.path.exists(outdir):
     os.makedirs(outdir)
   
@@ -32,8 +36,11 @@ def main():
       code = scan(os.path.join(indir, f))
       if (code != None) :
         renamed = renamed+1
-        #shutil.copyfile(os.path.join(indir,f), os.path.join(outdir, code))
-        shutil.move(os.path.join(indir,f), os.path.join(outdir, code))
+        extension = os.path.splitext(f)[1]
+        if args.move:
+          shutil.move(os.path.join(indir,f), os.path.join(outdir, (code + '.'+extension)))
+        else:
+          shutil.copyfile(os.path.join(indir,f), os.path.join(outdir, (code + '.'+extension)))
       else:
         skipped = skipped+1
         print 'BAR CODE NOT FOUND !!!'

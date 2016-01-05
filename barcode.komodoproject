@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
-<project id="980c19df-ad71-4929-a0ad-2addf606da54" kpf_version="5" name="scan.komodoproject">
+<project id="980c19df-ad71-4929-a0ad-2addf606da54" kpf_version="5" name="barcode.komodoproject">
 <preference-set idref="980c19df-ad71-4929-a0ad-2addf606da54" id="project" preftype="project">
 <preference-set id="Invocations">
 <preference-set id="Project">
   <string id="cookieparams"></string>
-  <string relative="path" id="cwd">~/work/scan</string>
+  <string relative="path" id="cwd">~/work/barcode</string>
   <string id="documentRoot"></string>
   <string id="executable-params"></string>
   <string id="filename"></string>
