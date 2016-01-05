@@ -13,8 +13,12 @@ skipped = 0
 def main():
   global total, renamed, skipped
   
-  indir = sys.argv[1]
-  outdir = sys.argv[2]
+  if(sys.argv.count == 2):
+    indir = sys.argv[1]
+    outdir = sys.argv[2]
+  else:
+    print 'USAGE: extract.py /src_dir /dst_dir'
+    return False
   
   if not os.path.exists(outdir):
     os.makedirs(outdir)
