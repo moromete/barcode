@@ -87,9 +87,11 @@ class gui(QtGui.QWidget):
     hboxBottom	 = QtGui.QHBoxLayout()
     btnS = QtGui.QPushButton('Start')
     btnS.clicked.connect(self.parseImg)
+    btnS.setMaximumWidth(140)
     hboxBottom.addWidget(btnS)
     btnQ = QtGui.QPushButton('Exit')
     btnQ.clicked.connect(exit)
+    btnQ.setMaximumWidth(140)
     hboxBottom.addWidget(btnQ)
     vbox.addLayout(hboxBottom)
      
@@ -97,7 +99,7 @@ class gui(QtGui.QWidget):
   
   def chooseDir(self, dirType):
     #filename = QFileDialog.getOpenFileName(w, 'Open File', '/')
-    selDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory"))
+    selDir = str(QtGui.QFileDialog.getExistingDirectory(self, "Select Directory", "~"))
     if(dirType=='src'):
       self.labelSrc.setText(selDir)
     else :
