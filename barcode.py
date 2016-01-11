@@ -5,6 +5,9 @@ import os
 import sys
 import shutil
 import argparse
+import zbar
+#import Image
+from PIL import Image
 from PyQt4 import QtGui
 
 class gui(QtGui.QWidget):
@@ -99,17 +102,20 @@ class gui(QtGui.QWidget):
       self.labelSrc.setText(selDir)
     else :
       self.labelDst.setText(selDir)
-    print selDir
-  
+
   def parseImg(self):
-    dirSrc = self.labelSrc.text();
-    dirDst = self.labelDst.text();
+    dirSrc = str(self.labelSrc.text());
+    dirDst = str(self.labelDst.text());
     
     if((len(dirSrc) == 0) or (len(dirDst) == 0)):
-      print "Please specify a source and a destination directory"
+      QtGui.QMessageBox.information(self,
+                                    "Error",
+                                    "Please specify a source and a destination directory")
       return False
     if(dirSrc == dirDst):
-      print "Source and Destination can not be the same"
+      QtGui.QMessageBox.information(self,
+                                    "Error",
+                                    "Source and Destination can not be the same")
       return False
     
     extractor = extract(dirSrc, dirDst)
@@ -130,25 +136,26 @@ class extract():
     #create dst directory if it does not exist
     if not os.path.exists(self.dirDst):
       os.makedirs(self.dirDst)
-      
+    
     for root, dirs, filenames in os.walk(self.dirSrc):
-      print 'PARSE FILES ...'
-      print '--------------------------'
+      log('PARSE FILES ...')
+      log('--------------------------')
       for f in filenames:
         self.total = self.total+1
-        print f
+        log(f)
         code = self.scan(os.path.join(self.dirSrc, f))
         if (code != None) :
           self.renamed = self.renamed+1
           extension = os.path.splitext(f)[1]
           if move:
-            shutil.move(os.path.join(self.dirSrc, f), os.path.join(self.dirDst, (code + '.'+extension)))
+            shutil.move(os.path.join(self.dirSrc, f), os.path.join(self.dirDst, (code + extension)))
           else:
-            shutil.copyfile(os.path.join(self.dirSrc,f), os.path.join(self.dirDst, (code + '.'+extension)))
+            shutil.copyfile(os.path.join(self.dirSrc,f), os.path.join(self.dirDst, (code + extension)))
         else:
           self.skipped = self.skipped+1
-          print 'BAR CODE NOT FOUND !!!'
-        print '--------------------------'
+          log('BAR CODE NOT FOUND !!!')
+        log('--------------------------')
+    log('total = '+str(self.total)+' renamed = '+str(self.renamed)+' skipped = '+str(self.skipped))
   
   def scan(self, img):
     # create a reader
@@ -171,8 +178,7 @@ class extract():
     # extract results
     code = None
     for symbol in image:
-      # do something useful with results
-      print 'decoded', symbol.type, 'symbol', '"%s"' % symbol.data
+      log('decoded '+str(symbol.type)+' symbol "'+str(symbol.data)+'"')
       code = symbol.data
       break
   
@@ -184,7 +190,7 @@ def log(msg):
   print msg
   try:
     global interface
-    interface.logOutput.insertPlainText(msg)
+    interface.logOutput.insertPlainText(msg+"\n")
   except:
     pass
     

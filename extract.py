@@ -38,9 +38,9 @@ def main():
         renamed = renamed+1
         extension = os.path.splitext(f)[1]
         if args.move:
-          shutil.move(os.path.join(indir,f), os.path.join(outdir, (code + '.'+extension)))
+          shutil.move(os.path.join(indir,f), os.path.join(outdir, (code + extension)))
         else:
-          shutil.copyfile(os.path.join(indir,f), os.path.join(outdir, (code + '.'+extension)))
+          shutil.copyfile(os.path.join(indir,f), os.path.join(outdir, (code + extension)))
       else:
         skipped = skipped+1
         print 'BAR CODE NOT FOUND !!!'
