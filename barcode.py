@@ -182,7 +182,7 @@ class extract():
     for symbol in image:
       log('decoded '+str(symbol.type)+' symbol "'+str(symbol.data)+'"')
       code = symbol.data
-      #break
+      break
   
     # clean up
     del(image)
