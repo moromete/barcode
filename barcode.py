@@ -182,7 +182,7 @@ class extract():
     for symbol in image:
       log('decoded '+str(symbol.type)+' symbol "'+str(symbol.data)+'"')
       code = symbol.data
-      break
+      #break
   
     # clean up
     del(image)
@@ -197,21 +197,15 @@ def log(msg):
     pass
     
 ############################################################################################
+parser = argparse.ArgumentParser()
+parser.add_argument("-g", "--gui", help="enable GUI", action="store_true")
+parser.add_argument("-m", "--move", help="delete files from source directory after rename", action="store_true")
+parser.add_argument("-s", "--src", help="source directory")
+parser.add_argument("-d", "--dst", help="destination directory")
+args = parser.parse_args()
 
-parserGui = argparse.ArgumentParser()
-parserGui.add_argument("-g", "--gui", help="enable GUI",
-                    action="store_true")
-argsGui = parserGui.parse_args()
-
-if(not argsGui.gui):
-  parser = argparse.ArgumentParser()
-  parser.add_argument("-m", "--move", help="delete files from source directory after rename",
-                      action="store_true")
-  parser.add_argument("dirSrc", help="source directory")
-  parser.add_argument("dirDst", help="destination directory")
-  args = parser.parse_args()
-  
-  extractor = extract(args.dirSrc, args.dirDst)
+if(not args.gui):  
+  extractor = extract(args.src, args.dst)
   extractor.process(args.move)
 else:
   # Create an PyQT4 application object.
