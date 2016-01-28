@@ -10,6 +10,7 @@ import zbar
 from PIL import Image
 from PIL import ImageEnhance
 from PyQt4 import QtGui
+import thread;
 
 class gui(QtGui.QWidget):
   width = 500
@@ -122,7 +123,8 @@ class gui(QtGui.QWidget):
       return False
     
     extractor = extract(dirSrc, dirDst)
-    extractor.process(self.inputMove.isChecked()) 
+    #extractor.process(self.inputMove.isChecked())
+    thread.start_new_thread(extractor.process, (self.inputMove.isChecked(), ))
     
     return True
     
