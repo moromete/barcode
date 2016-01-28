@@ -8,6 +8,7 @@ import argparse
 import zbar
 #import Image
 from PIL import Image
+from PIL import ImageEnhance
 from PyQt4 import QtGui
 
 class gui(QtGui.QWidget):
@@ -160,16 +161,43 @@ class extract():
     log('total = '+str(self.total)+' renamed = '+str(self.renamed)+' skipped = '+str(self.skipped))
   
   def scan(self, img):
+    pilImage = Image.open(img).convert('L');
+    
+    code = None
+    code = self.detectBarcode(pilImage)
+    
+    #try enchance
+    if(code == None) :
+      for i in range(9):
+        enhancerB = ImageEnhance.Brightness(pilImage)
+        factorB = 1.0+float(i)/10
+        pilImage = enhancerB.enhance(factorB)
+        
+        for j in range(9):
+          enhancerC = ImageEnhance.Contrast(pilImage)
+          factorC = 1.0+float(j)/10
+          pilImage = enhancerC.enhance(factorC)
+          code = self.detectBarcode(pilImage)
+          if(code != None):
+            #log('enchance '+str(factorB))
+            #log('enchance '+str(factorC))
+            pilImage.save('/home/cip/dst/test.jpg')
+            break
+        if(code != None):
+          break
+  
+    # clean up
+    del(pilImage)
+    return code
+  
+  def detectBarcode(self, pilImage) :
+    width, height = pilImage.size
+    raw = pilImage.tostring()
+    
     # create a reader
     scanner = zbar.ImageScanner()
-    
     # configure the reader
     scanner.parse_config('enable')
-    
-    # obtain image data
-    pil = Image.open(img).convert('L')
-    width, height = pil.size
-    raw = pil.tostring()
     
     # wrap image data
     image = zbar.Image(width, height, 'Y800', raw)
@@ -183,8 +211,7 @@ class extract():
       log('decoded '+str(symbol.type)+' symbol "'+str(symbol.data)+'"')
       code = symbol.data
       break
-  
-    # clean up
+    
     del(image)
     return code
 
