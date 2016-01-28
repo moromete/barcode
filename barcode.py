@@ -181,7 +181,7 @@ class extract():
           if(code != None):
             #log('enchance '+str(factorB))
             #log('enchance '+str(factorC))
-            pilImage.save('/home/cip/dst/test.jpg')
+            #pilImage.save('/home/cip/dst/test.jpg')
             break
         if(code != None):
           break
