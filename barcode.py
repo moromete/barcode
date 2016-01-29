@@ -11,6 +11,7 @@ from PIL import Image
 from PIL import ImageEnhance
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt
+
 #import thread;
 
 class gui(QtGui.QWidget):
@@ -20,7 +21,7 @@ class gui(QtGui.QWidget):
   def __init__(self, args):
     super(gui, self).__init__()
     self.initUI(args)
-  
+    
   def initUI(self, args):
     # Set window size. 
     self.resize(self.width, self.height)
@@ -124,14 +125,17 @@ class gui(QtGui.QWidget):
                                     "Source and Destination can not be the same")
       return False
     
-    extractor = extract(dirSrc, dirDst)
-    self.btnS.setEnabled(False);
+    interface.logOutput.setPlainText("")
+    #self.btnS.setEnabled(False);
     QtGui.QApplication.setOverrideCursor(QtGui.QCursor(Qt.WaitCursor))
-    extractor.process(self.inputMove.isChecked())
-    QtGui.QApplication.restoreOverrideCursor()
-    self.btnS.setEnabled(True);
     
-    #thread.start_new_thread(extractor.process, (self.inputMove.isChecked(), ))
+    extractor = extract(dirSrc, dirDst)
+    extractor.process(self.inputMove.isChecked())
+    
+    QtGui.QApplication.restoreOverrideCursor()
+    #self.btnS.setEnabled(True);
+    
+    #thread.start_new_thread(extractor.process, (self.inputMove.isChecked()))
     
     return True
     
@@ -143,7 +147,7 @@ class extract():
   def __init__(self, dirSrc, dirDst):
     self.dirSrc = dirSrc
     self.dirDst = dirDst
-
+    
   def process(self, move):
     #create dst directory if it does not exist
     if not os.path.exists(self.dirDst):
@@ -241,12 +245,12 @@ parser.add_argument("-s", "--src", help="source directory")
 parser.add_argument("-d", "--dst", help="destination directory")
 args = parser.parse_args()
 
-if(not args.gui):  
+if(not args.gui):
   extractor = extract(args.src, args.dst)
   extractor.process(args.move)
 else:
   # Create an PyQT4 application object.
-  a = QtGui.QApplication(sys.argv)       
+  a = QtGui.QApplication(sys.argv)
   interface = gui(args)
   sys.exit(a.exec_())
   
