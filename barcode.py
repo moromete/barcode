@@ -10,23 +10,24 @@ import zbar
 from PIL import Image
 from PIL import ImageEnhance
 from PyQt4 import QtGui
-import thread;
+from PyQt4.QtCore import Qt
+#import thread;
 
 class gui(QtGui.QWidget):
   width = 500
   height = 400
   
-  def __init__(self):
+  def __init__(self, args):
     super(gui, self).__init__()
-    self.initUI()
+    self.initUI(args)
   
-  def initUI(self):
+  def initUI(self, args):
     # Set window size. 
     self.resize(self.width, self.height)
      
     # Set window title  
     self.setWindowTitle("Barcode")
-    self.doLayout();
+    self.doLayout(args);
     
     self.center()
     self.show() 
@@ -38,7 +39,7 @@ class gui(QtGui.QWidget):
     frameGm.moveCenter(centerPoint)
     self.move(frameGm.topLeft())
     
-  def doLayout(self):
+  def doLayout(self, args):
     vbox	 = QtGui.QVBoxLayout()
 
     hbox1	 = QtGui.QHBoxLayout()
@@ -46,7 +47,7 @@ class gui(QtGui.QWidget):
     btnSrc.clicked.connect(lambda: self.chooseDir('src'))
     btnSrc.setMaximumWidth(140)
     hbox1.addWidget(btnSrc, 2)
-    self.labelSrc = QtGui.QLabel("")
+    self.labelSrc = QtGui.QLabel(args.src)
     #labelSrc.setFixedWidth(200)
     self.labelSrc.setWordWrap(True)
     hbox1.addWidget(self.labelSrc, 4)
@@ -57,7 +58,7 @@ class gui(QtGui.QWidget):
     btnDst.clicked.connect(lambda: self.chooseDir('dst'))
     btnDst.setMaximumWidth(140)
     hbox2.addWidget(btnDst, 2)
-    self.labelDst = QtGui.QLabel("")
+    self.labelDst = QtGui.QLabel(args.dst)
     #labelDst.setFixedWidth(200)
     self.labelDst.setWordWrap(True)
     hbox2.addWidget(self.labelDst, 4)
@@ -65,7 +66,8 @@ class gui(QtGui.QWidget):
     
     hbox3	 = QtGui.QHBoxLayout()
     self.inputMove = QtGui.QCheckBox('Move files', self)
-    self.inputMove.toggle()
+    if(args.move):
+      self.inputMove.toggle()
     hbox3.addWidget(self.inputMove)
     vbox.addLayout(hbox3)
     
@@ -73,7 +75,7 @@ class gui(QtGui.QWidget):
     self.logOutput = QtGui.QTextEdit()
     self.logOutput.setReadOnly(True)
     self.logOutput.setLineWrapMode(QtGui.QTextEdit.NoWrap)
-    self.logOutput.moveCursor(QtGui.QTextCursor.End)
+    #self.logOutput.moveCursor(QtGui.QTextCursor.End)
     font = self.logOutput.font()
     font.setFamily("Courier")
     font.setPointSize(10)
@@ -87,10 +89,10 @@ class gui(QtGui.QWidget):
     vbox.addLayout(hbox4)
     
     hboxBottom	 = QtGui.QHBoxLayout()
-    btnS = QtGui.QPushButton('Start')
-    btnS.clicked.connect(self.parseImg)
-    btnS.setMaximumWidth(140)
-    hboxBottom.addWidget(btnS)
+    self.btnS = QtGui.QPushButton('Start')
+    self.btnS.clicked.connect(self.parseImg)
+    self.btnS.setMaximumWidth(140)
+    hboxBottom.addWidget(self.btnS)
     btnQ = QtGui.QPushButton('Exit')
     btnQ.clicked.connect(exit)
     btnQ.setMaximumWidth(140)
@@ -123,8 +125,13 @@ class gui(QtGui.QWidget):
       return False
     
     extractor = extract(dirSrc, dirDst)
-    #extractor.process(self.inputMove.isChecked())
-    thread.start_new_thread(extractor.process, (self.inputMove.isChecked(), ))
+    self.btnS.setEnabled(False);
+    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(Qt.WaitCursor))
+    extractor.process(self.inputMove.isChecked())
+    QtGui.QApplication.restoreOverrideCursor()
+    self.btnS.setEnabled(True);
+    
+    #thread.start_new_thread(extractor.process, (self.inputMove.isChecked(), ))
     
     return True
     
@@ -161,7 +168,7 @@ class extract():
           log('BAR CODE NOT FOUND !!!')
         log('--------------------------')
     log('total = '+str(self.total)+' renamed = '+str(self.renamed)+' skipped = '+str(self.skipped))
-  
+
   def scan(self, img):
     pilImage = Image.open(img).convert('L');
     
@@ -222,6 +229,7 @@ def log(msg):
   try:
     global interface
     interface.logOutput.insertPlainText(msg+"\n")
+    interface.logOutput.moveCursor(QtGui.QTextCursor.End)
   except:
     pass
     
@@ -239,6 +247,6 @@ if(not args.gui):
 else:
   # Create an PyQT4 application object.
   a = QtGui.QApplication(sys.argv)       
-  interface = gui()
+  interface = gui(args)
   sys.exit(a.exec_())
   
